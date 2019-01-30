@@ -6,12 +6,13 @@
 <canvas id='board_canvas' width=1200 height=800></canvas>
 <br>
 <div id='status'></div>
+<script language='JavaScript' type='text/javascript' src='js/jquery.min.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/solve.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/sas.js'></script>
 <script>
 let cols = 90;
 let rows = 60;
-let mines = Math.round(cols * rows / 4);
+let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
 initMap(rows, cols);
 console.log(smap);
@@ -20,7 +21,6 @@ open_zero();
 solveMine(map, mines);
 </script>
 
-<script language='JavaScript' type='text/javascript' src='js/jquery.min.js'></script>
 <link href='css/crosshair.css' rel=stylesheet>
 <div id="crosshair-h" class="hair"></div>
 <div id="crosshair-v" class="hair"></div>

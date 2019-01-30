@@ -4,6 +4,7 @@ let smap = [];
 let map = [];
 // Number of tries to open a mine
 let test_errors = 0;
+let start_time = new Date();
 
 function generate(rows, cols, mines) {
   smap = [];
@@ -153,7 +154,8 @@ function simple_solve(map, n) {
 
 function update_status(st) {
   let el = $('#status');
-  el.html(st);
+  let time = new Date();
+  el.html(st + ' in ' + Math.floor((time - start_time)/100) / 10 + ' s');
 }
 
 function solve_timer() {
@@ -216,10 +218,16 @@ function show_board() {
       let x2 = Math.round(canvas.width * (x + 1) / cols);
       let y1 = Math.round(canvas.height * y / rows);
       let y2 = Math.round(canvas.height * (y + 1) / rows);
+      if (x2 - x1 > 6) {
+        --x2;
+        ++x1;
+        --y2;
+        ++y1;
+      }
       if (map[x][y] === 9) {
         ctx.fillStyle = "#990000";
         if (map_sas[x][y]) ctx.fillStyle = "#0000ff";
-        ctx.fillRect(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2);
+        ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
       }
       else if (map[x][y] === 10) {
         if (smap[x][y] === 'x') {
@@ -228,15 +236,17 @@ function show_board() {
         else {
           ctx.fillStyle = "#bbbbbb";
         }
-        ctx.fillRect(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2);
+        ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
       }
       else if (map[x][y] !== 0) {
         if (map_sas[x][y]) {
           ctx.fillStyle = "#bbbbff";
-          ctx.fillRect(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2);
+          ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
-        ctx.fillStyle = "#000000";
-        ctx.fillText(map[x][y], (x1 + x2) / 2, (y1 + y2) / 2 + (y2 - y1) * 0.1);
+        if (x2 - x1 > 6) {
+          ctx.fillStyle = "#000000";
+          ctx.fillText(map[x][y], (x1 + x2) / 2, (y1 + y2) / 2 + (y2 - y1) * 0.1);
+        }
       }
     }
   }

@@ -31,7 +31,7 @@ function add_rule(did, x, y) {
   if (qc === 0) return 0;
   let mc = adjacent_count(map, x, y, 9);
   let sum = map[x][y] - mc;
-  if (!sum) return;
+  //if (!sum) return;
   // Create new rule
   let rid = ra.length;
   ra[rid] = {x: x, y: y, qc: qc, sum: sum, mc: mc, qa: new Set(), max_q: 0};
@@ -163,7 +163,7 @@ function sas_scan() {
     }
     if (finished) break;
     ++cycle;
-    if (cycle > 1000000000) {
+    if (cycle > 10000000000) {
       console.log("Aborting");
       ++sas_aborts;
       break;
