@@ -12,7 +12,7 @@ let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
 
 <?php
-$fa = file("maps/map1.txt");
+$fa = file("maps/map5.txt");
 $cols = count($fa);
 echo "smap = [];\n";
 echo "cols = $cols;\n";

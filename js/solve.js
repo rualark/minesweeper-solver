@@ -118,13 +118,13 @@ function initMapSas() {
 
 function open_zero() {
   let opened = 0;
-  for (let x = cols*0.5 - 1; x>=0; --x) {
-    for (let y=rows*0.5 - 1; y>=0; --y) {
+  for (let x = cols - 1; x >= 0; --x) {
+    for (let y = rows - 1; y >= 0; --y) {
       //console.log("open_zero", x, y);
       if (smap[x][y] !== 0) continue;
       map[x][y] = 0;
       ++opened;
-      if (opened > rows*cols*0.001) return;
+      if (opened > rows*cols*0.01) return;
     }
   }
   for (let t=0; t<100000; ++t) {

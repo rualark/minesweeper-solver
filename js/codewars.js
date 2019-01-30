@@ -25,6 +25,10 @@ let map_sas = [];
 let p = 0;
 // Number of aborts
 let sas_aborts = 0;
+// Number of hidden mines
+let hidden_mines = 0;
+// Single domain scan
+let single_domain = 0;
 
 function add_rule(did, x, y) {
   // Skip out of range
@@ -123,6 +127,12 @@ function check_rules() {
       if (sum > ra[rid].sum) return 0;
     }
   }
+  let sum = 0;
+  for (let q = 0; q <= p; ++q) {
+    sum += qv[q];
+  }
+  //console.log("Hidden mines", sum, hidden_mines);
+  if (sum > hidden_mines) return 0;
   return 1;
 }
 
@@ -207,13 +217,27 @@ function sas_open() {
   return res;
 }
 
-function sas_solve() {
+function get_hidden_mines() {
+  let visible_mines = 0;
+  for (let x=0; x<cols; ++x) {
+    for (let y=0; y<rows; ++y) {
+      if (map[x][y] === 9) ++visible_mines;
+    }
+  }
+  hidden_mines = mines - visible_mines;
+}
+
+function sas_solve(sd = 1) {
+  single_domain = sd;
   // Clear
-  did = 0;
+  did = 1;
   dia = [];
   for (let x=-1; x<=cols; ++x) {
     dia[x] = [];
   }
+  ra = [];
+  qa = [];
+  get_hidden_mines();
   // Find domains of questions
   for (let x=0; x<cols; ++x) {
     for (let y=0; y<rows; ++y) {
@@ -225,15 +249,17 @@ function sas_solve() {
       let qc = adjacent_count(map, x, y, 10);
       if (!qc) continue;
       // Init new domain
-      ++did;
-      ra = [];
-      qa = [];
+      if (!single_domain) {
+        ++did;
+        ra = [];
+        qa = [];
+      }
       add_rule(did, x, y);
       // Skip scan if nothing detected
       if (!qa.length) continue;
       get_links();
       init_scan();
-      console.log("SAS scan started for domain:", did, map);
+      //console.log("SAS scan started for domain:", did);
       if (sas_scan()) return 1;
       //console.log(ra, qa);
     }
@@ -324,6 +350,7 @@ function solveMine(imap, n){
   let sa = imap.split("\n");
   cols = sa.length;
   // Add pre-column and post-column
+  map = [];
   map[-1] = [];
   map[cols] = [];
   for (let x=0; x<cols; ++x) {
@@ -336,7 +363,7 @@ function solveMine(imap, n){
       else map[x][y] = parseInt(sa2[y]);
     }
   }
-  console.log(map);
+  //console.log(map);
   // Init map_sas
   map_sas = [];
   for (let x=-1; x<=cols; ++x) {
@@ -357,6 +384,7 @@ function solveMine(imap, n){
   }
   console.log("Errors:", test_errors, sas_aborts);
   // Save
+  //console.log(map);
   imap = "";
   for (let x=0; x<cols; ++x) {
     for (let y=0; y<rows; ++y) {
@@ -369,4 +397,3 @@ function solveMine(imap, n){
   }
   return imap;
 }
-

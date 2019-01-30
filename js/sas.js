@@ -21,6 +21,8 @@ let p = 0;
 let sas_aborts = 0;
 // Number of hidden mines
 let hidden_mines = 0;
+// Single domain scan
+let single_domain = 0;
 
 function add_rule(did, x, y) {
   // Skip out of range
@@ -220,13 +222,16 @@ function get_hidden_mines() {
   hidden_mines = mines - visible_mines;
 }
 
-function sas_solve() {
+function sas_solve(sd = 1) {
+  single_domain = sd;
   // Clear
-  did = 0;
+  did = 1;
   dia = [];
   for (let x=-1; x<=cols; ++x) {
     dia[x] = [];
   }
+  ra = [];
+  qa = [];
   get_hidden_mines();
   // Find domains of questions
   for (let x=0; x<cols; ++x) {
@@ -239,9 +244,11 @@ function sas_solve() {
       let qc = adjacent_count(map, x, y, 10);
       if (!qc) continue;
       // Init new domain
-      ++did;
-      ra = [];
-      qa = [];
+      if (!single_domain) {
+        ++did;
+        ra = [];
+        qa = [];
+      }
       add_rule(did, x, y);
       // Skip scan if nothing detected
       if (!qa.length) continue;
