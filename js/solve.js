@@ -187,20 +187,20 @@ function solve_timer() {
   let res = simple_solve();
   show_board();
   if (res) {
-    window.setTimeout(solve_timer, 30);
+    window.setTimeout(solve_timer, 3);
   }
   else {
     update_status("Solving: step-append scan");
     let res2 = sas_solve();
     show_board();
     if (res2) {
-      window.setTimeout(solve_timer, 30);
+      window.setTimeout(solve_timer, 3);
     }
     else {
       res2 = sas_solve(1);
       show_board();
       if (res2) {
-        window.setTimeout(solve_timer, 30);
+        window.setTimeout(solve_timer, 3);
       }
       else {
         update_status("Finished");

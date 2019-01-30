@@ -140,7 +140,26 @@ function sas_scan() {
   let cycle = 0;
   let finished = 0;
   let solutions = [];
+  let canvas = document.getElementById("sas_progress");
+  let ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (;;) {
+    if (cycle % 10000 === 0) {
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 900 - cycle / 10000, 4, 1);
+      for (let q = 0; q < qa.length; ++q) {
+        if (q > p) {
+          ctx.fillStyle = "#bbbbbb";
+        }
+        else if (qv[q]) {
+          ctx.fillStyle = "#00ff00";
+        }
+        else {
+          ctx.fillStyle = "#0000ff";
+        }
+        ctx.fillRect(0, q, 4, 1);
+      }
+    }
     let need_skip = 1;
     let good = check_rules();
     if (good) {

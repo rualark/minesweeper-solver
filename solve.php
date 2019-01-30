@@ -1,7 +1,11 @@
 <link rel="shortcut icon" href="img/mine.ico">
+<table>
+<tr><td>
 <canvas id='board_canvas' width=1600 height=900></canvas>
-<br>
-<div id='status'></div>
+<td>
+<canvas id='sas_progress' width=4 height=900></canvas>
+</table>
+<span id='status'></span>
 <script language='JavaScript' type='text/javascript' src='js/jquery.min.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/solve.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/sas.js'></script>
