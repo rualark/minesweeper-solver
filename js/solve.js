@@ -118,13 +118,17 @@ function initMapSas() {
 
 function open_zero() {
   let opened = 0;
-  for (let x = cols - 1; x >= 0; --x) {
-    for (let y = rows - 1; y >= 0; --y) {
+  let x_start = cols - 1;
+  if (cols > 30) x_start = Math.round(cols/2 - 1);
+  let y_start = cols - 1;
+  if (rows > 30) y_start = Math.round(rows/2 - 1);
+  for (let x = x_start; x >= 0; --x) {
+    for (let y = y_start; y >= 0; --y) {
       //console.log("open_zero", x, y);
       if (smap[x][y] !== 0) continue;
       map[x][y] = 0;
       ++opened;
-      if (opened > rows*cols*0.01) return;
+      if (opened > rows*cols*0.001) return;
     }
   }
   for (let t=0; t<100000; ++t) {
@@ -193,8 +197,15 @@ function solve_timer() {
       window.setTimeout(solve_timer, 30);
     }
     else {
-      update_status("Finished");
-      console.log("Errors:", test_errors, sas_aborts);
+      res2 = sas_solve(1);
+      show_board();
+      if (res2) {
+        window.setTimeout(solve_timer, 30);
+      }
+      else {
+        update_status("Finished");
+        console.log("Errors:", test_errors, sas_aborts);
+      }
     }
   }
 }

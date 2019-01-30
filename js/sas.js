@@ -125,8 +125,13 @@ function check_rules() {
   for (let q = 0; q <= p; ++q) {
     sum += qv[q];
   }
-  console.log("Hidden mines", sum, hidden_mines);
-  if (sum > hidden_mines) return 0;
+  //console.log("Hidden mines", sum, hidden_mines);
+  if (p === qa.length - 1 && single_domain) {
+    if (sum !== hidden_mines) return 0;
+  }
+  else {
+    if (sum > hidden_mines) return 0;
+  }
   return 1;
 }
 
@@ -222,7 +227,7 @@ function get_hidden_mines() {
   hidden_mines = mines - visible_mines;
 }
 
-function sas_solve(sd = 1) {
+function sas_solve(sd = 0) {
   single_domain = sd;
   // Clear
   did = 1;
@@ -250,14 +255,24 @@ function sas_solve(sd = 1) {
         qa = [];
       }
       add_rule(did, x, y);
-      // Skip scan if nothing detected
-      if (!qa.length) continue;
-      get_links();
-      init_scan();
-      console.log("SAS scan started for domain:", did);
-      if (sas_scan()) return 1;
+      if (!single_domain) {
+        // Skip scan if nothing detected
+        if (!qa.length) continue;
+        get_links();
+        init_scan();
+        console.log("SAS scan started for domain:", did, single_domain);
+        if (sas_scan()) return 1;
+      }
       //console.log(ra, qa);
     }
+  }
+  if (single_domain) {
+    // Skip scan if nothing detected
+    if (!qa.length) return 0;
+    get_links();
+    init_scan();
+    console.log("SAS scan started for domain:", did, single_domain);
+    if (sas_scan()) return 1;
   }
   return 0;
 }
