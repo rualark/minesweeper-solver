@@ -159,6 +159,9 @@ function solve_timer() {
   if (res) {
     window.setTimeout(solve_timer, 30);
   }
+  else {
+    console.log("Errors:", test_errors);
+  }
 }
 
 function solveMine(map, n){

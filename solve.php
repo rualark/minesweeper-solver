@@ -15,5 +15,4 @@ console.log(smap);
 console.log(map);
 open_zero();
 solveMine(map, mines);
-console.log("Errors:", test_errors);
 </script>
