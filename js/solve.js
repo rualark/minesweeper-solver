@@ -257,7 +257,8 @@ function show_board() {
       }
       if (map[x][y] === 9) {
         ctx.fillStyle = "#990000";
-        if (map_sas[x][y]) ctx.fillStyle = "#0000ff";
+        if (map_sas[x][y] === 1) ctx.fillStyle = "#0000ff";
+        if (map_sas[x][y] === 2) ctx.fillStyle = "#00ff00";
         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
       }
       else if (map[x][y] === 10) {
@@ -270,8 +271,12 @@ function show_board() {
         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
       }
       else if (map[x][y] !== 0) {
-        if (map_sas[x][y]) {
-          ctx.fillStyle = "#bbbbff";
+        if (map_sas[x][y] === 1) {
+          ctx.fillStyle = "#bbaaff";
+          ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+        }
+        if (map_sas[x][y] === 2) {
+          ctx.fillStyle = "#bbffaa";
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
         if (x2 - x1 > 6) {

@@ -200,7 +200,7 @@ function sas_open() {
     if (!qpos[1][q] && qpos[0][q]) {
       let x = qa[q].x;
       let y = qa[q].y;
-      ++map_sas[x][y];
+      map_sas[x][y] = single_domain + 1;
       my_open(x, y);
       ++res;
     }
@@ -208,7 +208,7 @@ function sas_open() {
     else if (!qpos[0][q] && qpos[1][q]) {
       let x = qa[q].x;
       let y = qa[q].y;
-      ++map_sas[x][y];
+      map_sas[x][y] = single_domain + 1;
       map[x][y] = 9;
       ++res;
     }
