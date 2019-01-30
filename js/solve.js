@@ -185,24 +185,25 @@ function update_status(st) {
 function solve_timer() {
   update_status("Solving: simple algorithm");
   let res = simple_solve();
-  show_board();
   if (res) {
+    show_board();
     window.setTimeout(solve_timer, 3);
   }
   else {
     update_status("Solving: step-append scan");
     let res2 = sas_solve();
-    show_board();
     if (res2) {
+      show_board();
       window.setTimeout(solve_timer, 3);
     }
     else {
       res2 = sas_solve(1);
-      show_board();
       if (res2) {
+        show_board();
         window.setTimeout(solve_timer, 3);
       }
       else {
+        show_board();
         update_status("Finished");
         console.log("Errors:", test_errors, sas_aborts);
       }

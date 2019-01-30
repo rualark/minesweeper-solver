@@ -139,27 +139,7 @@ function sas_scan() {
   //console.log(JSON.stringify(qa));
   let cycle = 0;
   let finished = 0;
-  let solutions = [];
-  let canvas = document.getElementById("sas_progress");
-  let ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (;;) {
-    if (cycle % 10000 === 0) {
-      ctx.fillStyle = "#000000";
-      ctx.fillRect(0, 900 - cycle / 10000, 4, 1);
-      for (let q = 0; q < qa.length; ++q) {
-        if (q > p) {
-          ctx.fillStyle = "#bbbbbb";
-        }
-        else if (qv[q]) {
-          ctx.fillStyle = "#00ff00";
-        }
-        else {
-          ctx.fillStyle = "#0000ff";
-        }
-        ctx.fillRect(0, q, 4, 1);
-      }
-    }
     let need_skip = 1;
     let good = check_rules();
     if (good) {
@@ -168,7 +148,6 @@ function sas_scan() {
         for (let q = 0; q < qa.length; ++q) {
           ++qpos[qv[q]][q];
         }
-        solutions.push(qv);
       }
       else {
         //console.log("Continue:", qv, p);
@@ -232,7 +211,6 @@ function sas_open() {
       ++res;
     }
   }
-  show_board();
   return res;
 }
 
@@ -280,7 +258,9 @@ function sas_solve(sd = 0) {
         get_links();
         init_scan();
         console.log("SAS scan started for domain:", did, single_domain);
-        if (sas_scan()) return 1;
+        if (sas_scan()) {
+          return 1;
+        }
       }
       //console.log(ra, qa);
     }
@@ -291,7 +271,9 @@ function sas_solve(sd = 0) {
     get_links();
     init_scan();
     console.log("SAS scan started for domain:", did, single_domain);
-    if (sas_scan()) return 1;
+    if (sas_scan()) {
+      return 1;
+    }
   }
   return 0;
 }
