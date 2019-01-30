@@ -1,7 +1,3 @@
-<?php
-
-?>
-
 <link rel="shortcut icon" href="img/mine.ico">
 <canvas id='board_canvas' width=1200 height=800></canvas>
 <br>
@@ -14,10 +10,29 @@ let cols = 90;
 let rows = 60;
 let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
-initMap(rows, cols);
+
+<?php
+$fa = file("maps/map1.txt");
+$cols = count($fa);
+echo "smap = [];\n";
+echo "cols = $cols;\n";
+for ($x=0; $x<$cols; ++$x) {
+  $st = $fa[$x];
+  $st = str_replace("\n", "", $st);
+  $st = str_replace("x", "'x'", $st);
+  $st = str_replace("?", "'?'", $st);
+  $st = str_replace(" ", ", ", $st);
+  echo "smap[$x] = [$st];\n";
+}
+echo "rows = smap[0].length;\n";
+echo "countMines();\n";
+?>
+
+initMap();
+open_zero();
+initMapSas();
 console.log(smap);
 console.log(map);
-open_zero();
 solveMine(map, mines);
 </script>
 

@@ -77,20 +77,40 @@ function my_open(x, y) {
   if (res === 'x') map[x][y] = 9;
   if (res === '?') map[x][y] = 10;
   else map[x][y] = res;
-  simple_solve_square(map, mines, x, y);
+  simple_solve_square(x, y);
 }
 
-function initMap(rows, cols) {
+function initMap() {
   map = [];
-  map_sas = [];
   // Clear map
   for (let x=-1; x<=cols; ++x) {
     map[x] = [];
-    map_sas[x] = [];
   }
   for (let x=0; x<cols; ++x) {
     for (let y = 0; y < rows; ++y) {
       map[x][y] = 10;
+    }
+  }
+}
+
+function countMines() {
+  mines = 0;
+  for (let x=0; x<cols; ++x) {
+    for (let y=0; y<rows; ++y) {
+      if (smap[x][y] === 'x')
+        ++mines;
+    }
+  }
+}
+
+function initMapSas() {
+  map_sas = [];
+  // Clear map
+  for (let x=-1; x<=cols; ++x) {
+    map_sas[x] = [];
+  }
+  for (let x=0; x<cols; ++x) {
+    for (let y = 0; y < rows; ++y) {
       map_sas[x][y] = 0;
     }
   }
@@ -124,7 +144,7 @@ function open(row, column) {
   return smap[column][row];
 }
 
-function simple_solve_square(map, n, x, y) {
+function simple_solve_square(x, y) {
   if (map[x][y] !== 9 && map[x][y] !== 10) {
     let qc = adjacent_count(map, x, y, 10);
     // Skip if no adjacent questions
@@ -142,11 +162,11 @@ function simple_solve_square(map, n, x, y) {
   return 0;
 }
 
-function simple_solve(map, n) {
+function simple_solve() {
   let res = 0;
   for (let x=0; x<cols; ++x) {
     for (let y=0; y<rows; ++y) {
-      res += simple_solve_square(map, n, x, y);
+      res += simple_solve_square(x, y);
     }
   }
   return res;
@@ -160,7 +180,7 @@ function update_status(st) {
 
 function solve_timer() {
   update_status("Solving: simple algorithm");
-  let res = simple_solve(map, mines);
+  let res = simple_solve();
   show_board();
   if (res) {
     window.setTimeout(solve_timer, 30);

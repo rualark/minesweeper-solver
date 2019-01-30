@@ -1,3 +1,9 @@
+// Current guessing map state (9 is a mine, 10 is a question mark)
+let map = [];
+// Number of tries to open a mine
+let test_errors = 0;
+let start_time = new Date();
+
 // SAS
 // Domain id for each square
 let dia = [];
@@ -19,8 +25,6 @@ let map_sas = [];
 let p = 0;
 // Number of aborts
 let sas_aborts = 0;
-// Number of hidden mines
-let hidden_mines = 0;
 
 function add_rule(did, x, y) {
   // Skip out of range
@@ -119,12 +123,6 @@ function check_rules() {
       if (sum > ra[rid].sum) return 0;
     }
   }
-  let sum = 0;
-  for (let q = 0; q <= p; ++q) {
-    sum += qv[q];
-  }
-  console.log("Hidden mines", sum, hidden_mines);
-  if (sum > hidden_mines) return 0;
   return 1;
 }
 
@@ -206,18 +204,7 @@ function sas_open() {
       ++res;
     }
   }
-  show_board();
   return res;
-}
-
-function get_hidden_mines() {
-  let visible_mines = 0;
-  for (let x=0; x<cols; ++x) {
-    for (let y=0; y<rows; ++y) {
-      if (map[x][y] === 9) ++visible_mines;
-    }
-  }
-  hidden_mines = mines - visible_mines;
 }
 
 function sas_solve() {
@@ -227,7 +214,6 @@ function sas_solve() {
   for (let x=-1; x<=cols; ++x) {
     dia[x] = [];
   }
-  get_hidden_mines();
   // Find domains of questions
   for (let x=0; x<cols; ++x) {
     for (let y=0; y<rows; ++y) {
@@ -247,11 +233,140 @@ function sas_solve() {
       if (!qa.length) continue;
       get_links();
       init_scan();
-      console.log("SAS scan started for domain:", did);
+      console.log("SAS scan started for domain:", did, map);
       if (sas_scan()) return 1;
       //console.log(ra, qa);
     }
   }
   return 0;
+}
+
+function adjacent_count(map, x, y, val) {
+  let s = 0;
+  if (map[x][y - 1] === val) ++s;
+  if (map[x][y + 1] === val) ++s;
+  if (map[x - 1][y] === val) ++s;
+  if (map[x - 1][y - 1] === val) ++s;
+  if (map[x - 1][y + 1] === val) ++s;
+  if (map[x + 1][y] === val) ++s;
+  if (map[x + 1][y - 1] === val) ++s;
+  if (map[x + 1][y + 1] === val) ++s;
+  return s;
+}
+
+function adjacent_set(map, x, y, val, val2) {
+  let s = 0;
+  if (map[x][y - 1] === val) map[x][y - 1] = val2;
+  if (map[x][y + 1] === val) map[x][y + 1] = val2;
+  if (map[x - 1][y] === val) map[x - 1][y] = val2;
+  if (map[x - 1][y - 1] === val) map[x - 1][y - 1] = val2;
+  if (map[x - 1][y + 1] === val) map[x - 1][y + 1] = val2;
+  if (map[x + 1][y] === val) map[x + 1][y] = val2;
+  if (map[x + 1][y - 1] === val) map[x + 1][y - 1] = val2;
+  if (map[x + 1][y + 1] === val) map[x + 1][y + 1] = val2;
+  return s;
+}
+
+function adjacent_open(map, x, y, val) {
+  let s = 0;
+  if (map[x][y - 1] === val) my_open(x, y - 1);
+  if (map[x][y + 1] === val) my_open(x, y + 1);
+  if (map[x - 1][y] === val) my_open(x - 1, y);
+  if (map[x - 1][y - 1] === val) my_open(x - 1, y - 1);
+  if (map[x - 1][y + 1] === val) my_open(x - 1, y + 1);
+  if (map[x + 1][y] === val) my_open(x + 1, y);
+  if (map[x + 1][y - 1] === val) my_open(x + 1, y - 1);
+  if (map[x + 1][y + 1] === val) my_open(x + 1, y + 1);
+  return s;
+}
+
+function my_open(x, y) {
+  if (x < 0 || x >= cols) return 0;
+  if (y < 0 || y >= rows) return 0;
+  let res = open(x, y);
+  if (res === 'x') map[x][y] = 9;
+  if (res === '?') map[x][y] = 10;
+  else map[x][y] = parseInt(res);
+  simple_solve_square(x, y);
+}
+
+function simple_solve_square(x, y) {
+  if (map[x][y] !== 9 && map[x][y] !== 10) {
+    let qc = adjacent_count(map, x, y, 10);
+    // Skip if no adjacent questions
+    if (qc === 0) return 0;
+    let mc = adjacent_count(map, x, y, 9);
+    if (qc + mc === map[x][y]) {
+      adjacent_set(map, x, y, 10, 9);
+      return 1;
+    }
+    if (mc === map[x][y]) {
+      adjacent_open(map, x, y, 10);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+function simple_solve() {
+  let res = 0;
+  for (let x=0; x<cols; ++x) {
+    for (let y=0; y<rows; ++y) {
+      res += simple_solve_square(x, y);
+    }
+  }
+  return res;
+}
+
+function solveMine(imap, n){
+  mines = n;
+  // Load
+  let sa = imap.split("\n");
+  cols = sa.length;
+  // Add pre-column and post-column
+  map[-1] = [];
+  map[cols] = [];
+  for (let x=0; x<cols; ++x) {
+    let sa2 = sa[x].split(" ");
+    rows = sa2.length;
+    map[x] = [];
+    for (let y=0; y<rows; ++y) {
+      if (sa2[y] === '?') map[x][y] = 10;
+      else if (sa2[y] === 'x') map[x][y] = 9;
+      else map[x][y] = parseInt(sa2[y]);
+    }
+  }
+  console.log(map);
+  // Init map_sas
+  map_sas = [];
+  for (let x=-1; x<=cols; ++x) {
+    map_sas[x] = [];
+  }
+  for (let x=0; x<cols; ++x) {
+    for (let y = 0; y < rows; ++y) {
+      map_sas[x][y] = 0;
+    }
+  }
+  // Solve
+  for (;;) {
+    let res = simple_solve();
+    if (!res) {
+      let res2 = sas_solve();
+      if (!res2) break;
+    }
+  }
+  console.log("Errors:", test_errors, sas_aborts);
+  // Save
+  imap = "";
+  for (let x=0; x<cols; ++x) {
+    for (let y=0; y<rows; ++y) {
+      if (y) imap += " ";
+      if (map[x][y] === 10) return '?';
+      else if (map[x][y] === 9) imap += 'x';
+      else imap += map[x][y];
+    }
+    if (x < cols - 1) imap += "\n";
+  }
+  return imap;
 }
 
