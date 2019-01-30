@@ -70,10 +70,8 @@ function adjacent_open(map, x, y, val) {
 }
 
 function my_open(x, y) {
-  if (x < 0) return 0;
-  if (x >= cols) return 0;
-  if (y < 0) return 0;
-  if (y >= rows) return 0;
+  if (x < 0 || x >= cols) return 0;
+  if (y < 0 || y >= rows) return 0;
   let res = open(y, x);
   if (res === 'x') map[x][y] = 9;
   if (res === '?') map[x][y] = 10;
@@ -83,13 +81,16 @@ function my_open(x, y) {
 
 function initMap(rows, cols) {
   map = [];
+  map_sas = [];
   // Clear map
   for (let x=-1; x<=cols; ++x) {
     map[x] = [];
+    map_sas[x] = [];
   }
   for (let x=0; x<cols; ++x) {
     for (let y = 0; y < rows; ++y) {
       map[x][y] = 10;
+      map_sas[x][y] = 0;
     }
   }
 }
@@ -102,7 +103,7 @@ function open_zero() {
       if (smap[x][y] !== 0) continue;
       map[x][y] = 0;
       ++opened;
-      if (opened > rows*cols*0.01) return;
+      if (opened > rows*cols*0.001) return;
     }
   }
   for (let t=0; t<100000; ++t) {
@@ -125,17 +126,14 @@ function open(row, column) {
 function simple_solve_square(map, n, x, y) {
   if (map[x][y] !== 9 && map[x][y] !== 10) {
     let qc = adjacent_count(map, x, y, 10);
-    //console.log("qc", qc, x, y);
     // Skip if no adjacent questions
     if (qc === 0) return 0;
     let mc = adjacent_count(map, x, y, 9);
     if (qc + mc === map[x][y]) {
-      //console.log("adjacent_q_to_mine", x, y);
       adjacent_set(map, x, y, 10, 9);
       return 1;
     }
     if (mc === map[x][y]) {
-      //console.log("adjacent_q_open", x, y);
       adjacent_open(map, x, y, 10);
       return 1;
     }
@@ -153,14 +151,29 @@ function simple_solve(map, n) {
   return res;
 }
 
+function update_status(st) {
+  let el = $('#status');
+  el.html(st);
+}
+
 function solve_timer() {
+  update_status("Solving: simple algorithm");
   let res = simple_solve(map, mines);
-  show_board(map);
+  show_board();
   if (res) {
     window.setTimeout(solve_timer, 30);
   }
   else {
-    console.log("Errors:", test_errors);
+    update_status("Solving: step-append scan");
+    let res2 = sas_solve();
+    show_board();
+    if (res2) {
+      window.setTimeout(solve_timer, 30);
+    }
+    else {
+      update_status("Finished");
+      console.log("Errors:", test_errors, sas_aborts);
+    }
   }
 }
 
@@ -168,7 +181,7 @@ function solveMine(map, n){
   window.setTimeout(solve_timer, 100);
 }
 
-function show_board(map) {
+function show_board() {
   let canvas = document.getElementById("board_canvas");
   let ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -205,6 +218,7 @@ function show_board(map) {
       let y2 = Math.round(canvas.height * (y + 1) / rows);
       if (map[x][y] === 9) {
         ctx.fillStyle = "#990000";
+        if (map_sas[x][y]) ctx.fillStyle = "#0000ff";
         ctx.fillRect(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2);
       }
       else if (map[x][y] === 10) {
@@ -217,10 +231,14 @@ function show_board(map) {
         ctx.fillRect(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2);
       }
       else if (map[x][y] !== 0) {
+        if (map_sas[x][y]) {
+          ctx.fillStyle = "#bbbbff";
+          ctx.fillRect(x1 + 1, y1 + 1, x2 - x1 - 2, y2 - y1 - 2);
+        }
         ctx.fillStyle = "#000000";
         ctx.fillText(map[x][y], (x1 + x2) / 2, (y1 + y2) / 2 + (y2 - y1) * 0.1);
       }
     }
   }
-  canvas.title = 'Board';
+  //canvas.title = 'Board';
 }
