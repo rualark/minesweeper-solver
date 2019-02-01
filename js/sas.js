@@ -23,6 +23,10 @@ let sas_aborts = 0;
 let hidden_mines = 0;
 // Single domain scan
 let single_domain = 0;
+// Total questions left
+let total_q = 0;
+// Total sas results
+let total_sas = 0;
 
 function add_rule(did, x, y) {
   // Skip out of range
@@ -126,7 +130,7 @@ function check_rules() {
     sum += qv[q];
   }
   //console.log("Hidden mines", sum, hidden_mines);
-  if (p === qa.length - 1 && single_domain) {
+  if (p === qa.length - 1 && single_domain && qa.length === total_q) {
     if (sum !== hidden_mines) return 0;
   }
   else {
@@ -144,7 +148,7 @@ function sas_scan() {
     let good = check_rules();
     if (good) {
       if (p === qa.length - 1) {
-        //console.log("Good:", qv, p);
+        //console.log("Good:", JSON.stringify(qv), p, JSON.stringify(ra), JSON.stringify(qa));
         for (let q = 0; q < qa.length; ++q) {
           ++qpos[qv[q]][q];
         }
@@ -214,11 +218,15 @@ function sas_open() {
   return res;
 }
 
-function get_hidden_mines() {
+function get_stats() {
   let visible_mines = 0;
+  total_q = 0;
+  total_sas = 0;
   for (let x=0; x<cols; ++x) {
     for (let y=0; y<rows; ++y) {
       if (map[x][y] === 9) ++visible_mines;
+      if (map[x][y] === 10) ++total_q;
+      if (map_sas[x][y]) ++total_sas;
     }
   }
   hidden_mines = mines - visible_mines;
@@ -234,7 +242,7 @@ function sas_solve(sd = 0) {
   }
   ra = [];
   qa = [];
-  get_hidden_mines();
+  get_stats();
   // Find domains of questions
   for (let x=0; x<cols; ++x) {
     for (let y=0; y<rows; ++y) {
@@ -268,6 +276,8 @@ function sas_solve(sd = 0) {
   if (single_domain) {
     // Skip scan if nothing detected
     if (!qa.length) return 0;
+    // Skip scan if not all questions are being scanned
+    //if (qa.length !== total_q) return 0;
     get_links();
     init_scan();
     console.log("SAS scan started for domain:", did, single_domain);

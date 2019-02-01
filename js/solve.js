@@ -186,6 +186,7 @@ function solve_timer() {
   update_status("Solving: simple algorithm");
   let res = simple_solve();
   if (res) {
+    show_progress();
     show_board();
     window.setTimeout(solve_timer, 3);
   }
@@ -193,16 +194,19 @@ function solve_timer() {
     update_status("Solving: step-append scan");
     let res2 = sas_solve();
     if (res2) {
+      show_progress();
       show_board();
       window.setTimeout(solve_timer, 3);
     }
     else {
       res2 = sas_solve(1);
       if (res2) {
+        show_progress();
         show_board();
         window.setTimeout(solve_timer, 3);
       }
       else {
+        show_progress();
         show_board();
         update_status("Finished");
         console.log("Errors:", test_errors, sas_aborts);
@@ -213,6 +217,27 @@ function solve_timer() {
 
 function solveMine(map, n){
   window.setTimeout(solve_timer, 100);
+}
+
+function show_progress() {
+  get_stats();
+  let canvas = document.getElementById("progress_canvas");
+  let ctx = canvas.getContext("2d");
+  let total = rows * cols;
+  // Total sas
+  let done = total_sas;
+  // Total simple
+  let done2 = total - total_q - total_sas;
+  console.log(total, total_q, total_sas, done, done2);
+  let coef = canvas.height / total;
+  ctx.fillStyle = "#bbbbbb";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  let rhei = coef * done;
+  let rhei2 = coef * done2;
+  ctx.fillStyle = "#bb0000";
+  ctx.fillRect(0, canvas.height - rhei2, canvas.width, rhei2);
+  ctx.fillStyle = "#0000ff";
+  ctx.fillRect(0, canvas.height - rhei2 - rhei, canvas.width, rhei);
 }
 
 function show_board() {

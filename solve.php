@@ -1,6 +1,9 @@
 <link rel="shortcut icon" href="img/mine.ico">
+<table><tr><td>
 <canvas id='board_canvas' width=1600 height=900></canvas>
-<br>
+<td>
+<canvas id='progress_canvas' width=4 height=900></canvas>
+</table>
 <span id='status'></span>
 <script language='JavaScript' type='text/javascript' src='js/jquery.min.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/solve.js'></script>
@@ -12,7 +15,7 @@ let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
 
 <?php
-// $fname = "maps/map2.txt";
+//$fname = "maps/map5.txt";
 if ($fname != "") {
   $fa = file($fname);
   $cols = count($fa);
@@ -41,9 +44,9 @@ solveMine(map, mines);
 </script>
 
 <link href='css/crosshair.css' rel=stylesheet>
-<!-- <div id="crosshair-h" class="hair"></div>
+<div id="crosshair-h" class="hair"></div>
 <div id="crosshair-v" class="hair"></div>
-<span id="mousepos"></span> -->
+<span id="mousepos"></span>
 <script>
   $(document).ready(function() {
     // Setup our variables
