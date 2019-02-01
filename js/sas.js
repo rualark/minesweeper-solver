@@ -27,6 +27,12 @@ let single_domain = 0;
 let total_q = 0;
 // Total sas results
 let total_sas = 0;
+// If sas scan is in progress
+let sas_in_progress = 0;
+// Current sas cycle
+let sas_cycle = 0;
+// Sas progress
+let sas_progress = 0;
 
 function add_rule(did, x, y) {
   // Skip out of range
@@ -67,6 +73,7 @@ function add_q(did, x, y) {
   qa[qid] = {x: x, y: y, ra: new Set()};
   // Mark square as belonging to domain
   dia[x][y] = did;
+  console.log("add_q", x, y);
   // Add adjacent rules
   if (map[x][y - 1] < 9) add_rule(did, x, y - 1);
   if (map[x][y + 1] < 9) add_rule(did, x, y + 1);
@@ -130,7 +137,8 @@ function check_rules() {
     sum += qv[q];
   }
   //console.log("Hidden mines", sum, hidden_mines);
-  if (p === qa.length - 1 && single_domain && qa.length === total_q) {
+  // Find exact number of mines of number of scanned questions equals all questions
+  if (p === qa.length - 1 && qa.length === total_q) {
     if (sum !== hidden_mines) return 0;
   }
   else {
@@ -140,9 +148,6 @@ function check_rules() {
 }
 
 function sas_scan() {
-  //console.log(JSON.stringify(qa));
-  let cycle = 0;
-  let finished = 0;
   for (;;) {
     let need_skip = 1;
     let good = check_rules();
@@ -170,7 +175,7 @@ function sas_scan() {
         qv[p] = 0;
         // Can we move left?
         if (!p) {
-          finished = 1;
+          sas_in_progress = 0;
           break;
         }
         // Move left one element
@@ -178,18 +183,43 @@ function sas_scan() {
       }
       qv[p] = 1;
     }
-    if (finished) break;
-    ++cycle;
-    if (cycle > 10000000000) {
+    if (!sas_in_progress) break;
+    ++sas_cycle;
+    if (sas_cycle > 10000000000) {
       console.log("Aborting");
       ++sas_aborts;
       break;
     }
+    if (single_domain && sas_cycle % 10000 === 0) {
+      let time = new Date();
+      let progress = Math.floor(time / 200);
+      if (progress > sas_progress) {
+        sas_progress = progress;
+        let canvas = document.getElementById("sas_progress");
+        let ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let q = 0; q < qa.length; ++q) {
+          if (q > p) {
+            ctx.fillStyle = "#bbbbbb";
+          }
+          else if (qv[q]) {
+            ctx.fillStyle = "#00ff00";
+          }
+          else {
+            ctx.fillStyle = "#0000ff";
+          }
+          ctx.fillRect(0, q, 4, 1);
+        }
+        //console.log("Restarting sas cycle");
+        return 0;
+      }
+    }
   }
-  if (finished) {
+  if (!sas_in_progress) {
     return sas_open();
   }
   else {
+    sas_in_progress = 0;
     return 0;
   }
 }
@@ -266,9 +296,10 @@ function sas_solve(sd = 0) {
         get_links();
         init_scan();
         console.log("SAS scan started for domain:", did, single_domain);
-        if (sas_scan()) {
-          return 1;
-        }
+        //console.log(JSON.stringify(qa));
+        sas_cycle = 0;
+        sas_in_progress = 1;
+        if (sas_scan()) return 1;
       }
       //console.log(ra, qa);
     }
@@ -292,11 +323,10 @@ function sas_solve(sd = 0) {
     //if (qa.length !== total_q) return 0;
     get_links();
     init_scan();
-    console.log("SAS scan started for domain:", did, single_domain);
-    if (sas_scan()) {
-      return 1;
-    }
+    console.log("SAS full scan started for domain:", did, single_domain);
+    //console.log(JSON.stringify(qa));
+    sas_cycle = 0;
+    sas_in_progress = 1;
   }
   return 0;
 }
-

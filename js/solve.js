@@ -183,6 +183,34 @@ function update_status(st) {
 }
 
 function solve_timer() {
+  if (sas_in_progress) {
+    let res2 = sas_scan();
+    if (sas_in_progress) {
+      window.setTimeout(solve_timer, 3);
+      return;
+    }
+    if (res2) {
+      show_progress();
+      show_board();
+      window.setTimeout(solve_timer, 3);
+    }
+    else {
+      show_progress();
+      show_board();
+      update_status("Finished");
+      console.log("Errors:", test_errors, sas_aborts);
+    }
+    return;
+  }
+  get_stats();
+  // Successful finish
+  if (!total_q) {
+    show_progress();
+    show_board();
+    update_status("Finished");
+    console.log("Errors:", test_errors, sas_aborts);
+    return;
+  }
   update_status("Solving: simple algorithm");
   let res = simple_solve();
   if (res) {
@@ -199,18 +227,9 @@ function solve_timer() {
       window.setTimeout(solve_timer, 3);
     }
     else {
-      res2 = sas_solve(2);
-      if (res2) {
-        show_progress();
-        show_board();
-        window.setTimeout(solve_timer, 3);
-      }
-      else {
-        show_progress();
-        show_board();
-        update_status("Finished");
-        console.log("Errors:", test_errors, sas_aborts);
-      }
+      update_status("Solving: full step-append scan");
+      sas_solve(2);
+      solve_timer();
     }
   }
 }
@@ -228,7 +247,7 @@ function show_progress() {
   let done = total_sas;
   // Total simple
   let done2 = total - total_q - total_sas;
-  console.log(total, total_q, total_sas, done, done2);
+  //console.log(total, total_q, total_sas, done, done2);
   let coef = canvas.height / total;
   ctx.fillStyle = "#bbbbbb";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -286,8 +305,8 @@ function show_board() {
       if (map[x][y] === 9) {
         ctx.fillStyle = "#990000";
         if (map_sas[x][y] === 1) ctx.fillStyle = "#0000ff";
-        else if (map_sas[x][y] === 2) ctx.fillStyle = "#00bb00";
-        else if (map_sas[x][y] === 3) ctx.fillStyle = "#bb00bb";
+        else if (map_sas[x][y] === 2) ctx.fillStyle = "#bb00bb";
+        else if (map_sas[x][y] === 3) ctx.fillStyle = "#00bb00";
         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
       }
       else if (map[x][y] === 10) {
@@ -305,11 +324,11 @@ function show_board() {
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
         else if (map_sas[x][y] === 2) {
-          ctx.fillStyle = "#aaffaa";
+          ctx.fillStyle = "#ffccff";
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
         else if (map_sas[x][y] === 3) {
-          ctx.fillStyle = "#ffccff";
+          ctx.fillStyle = "#aaffaa";
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
         if (x2 - x1 > 6) {

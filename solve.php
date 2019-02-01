@@ -2,20 +2,22 @@
 <table><tr><td>
 <canvas id='board_canvas' width=1600 height=900></canvas>
 <td>
-<canvas id='progress_canvas' width=4 height=900></canvas>
-</table>
+<canvas id='progress_canvas' width=3 height=900></canvas>
+<td>
+<canvas id='sas_progress' width=3 height=900></canvas>
+</table></table>
 <span id='status'></span>
 <script language='JavaScript' type='text/javascript' src='js/jquery.min.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/solve.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/sas.js'></script>
 <script>
-let cols = 140;
-let rows = 80;
+let cols = 70;
+let rows = 40;
 let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
 
 <?php
-$fname = "maps/map4.txt";
+//$fname = "maps/map4.txt";
 if ($fname != "") {
   $fa = file($fname);
   $cols = count($fa);
@@ -44,9 +46,9 @@ solveMine(map, mines);
 </script>
 
 <link href='css/crosshair.css' rel=stylesheet>
-<div id="crosshair-h" class="hair"></div>
+<!--<div id="crosshair-h" class="hair"></div>
 <div id="crosshair-v" class="hair"></div>
-<span id="mousepos"></span>
+<span id="mousepos"></span>-->
 <script>
   $(document).ready(function() {
     // Setup our variables
