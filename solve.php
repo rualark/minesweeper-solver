@@ -15,7 +15,7 @@ let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
 
 <?php
-//$fname = "maps/map5.txt";
+$fname = "maps/map4.txt";
 if ($fname != "") {
   $fa = file($fname);
   $cols = count($fa);

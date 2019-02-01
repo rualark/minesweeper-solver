@@ -56,7 +56,7 @@ function add_rule(did, x, y) {
   if (map[x + 1][y + 1] === 10) add_q(did, x + 1, y + 1, rid);
 }
 
-function add_q(did, x, y, rid) {
+function add_q(did, x, y) {
   // Skip out of range
   if (x < 0 || x >= cols) return 0;
   if (y < 0 || y >= rows) return 0;
@@ -274,6 +274,18 @@ function sas_solve(sd = 0) {
     }
   }
   if (single_domain) {
+    // Add all questions
+    if (single_domain === 2) {
+      for (let x = 0; x < cols; ++x) {
+        for (let y = 0; y < rows; ++y) {
+          // Process only questions
+          if (map[x][y] !== 10) continue;
+          // Skip already in domain
+          if (dia[x][y] > 0) continue;
+          add_q(did, x, y);
+        }
+      }
+    }
     // Skip scan if nothing detected
     if (!qa.length) return 0;
     // Skip scan if not all questions are being scanned

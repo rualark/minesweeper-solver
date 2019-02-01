@@ -199,7 +199,7 @@ function solve_timer() {
       window.setTimeout(solve_timer, 3);
     }
     else {
-      res2 = sas_solve(1);
+      res2 = sas_solve(2);
       if (res2) {
         show_progress();
         show_board();
@@ -236,8 +236,10 @@ function show_progress() {
   let rhei2 = coef * done2;
   ctx.fillStyle = "#bb0000";
   ctx.fillRect(0, canvas.height - rhei2, canvas.width, rhei2);
-  ctx.fillStyle = "#0000ff";
-  ctx.fillRect(0, canvas.height - rhei2 - rhei, canvas.width, rhei);
+  if (done) {
+    ctx.fillStyle = "#0000ff";
+    ctx.fillRect(0, canvas.height - rhei2 - rhei, canvas.width, rhei);
+  }
 }
 
 function show_board() {
@@ -284,7 +286,8 @@ function show_board() {
       if (map[x][y] === 9) {
         ctx.fillStyle = "#990000";
         if (map_sas[x][y] === 1) ctx.fillStyle = "#0000ff";
-        if (map_sas[x][y] === 2) ctx.fillStyle = "#00ff00";
+        else if (map_sas[x][y] === 2) ctx.fillStyle = "#00bb00";
+        else if (map_sas[x][y] === 3) ctx.fillStyle = "#bb00bb";
         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
       }
       else if (map[x][y] === 10) {
@@ -298,11 +301,15 @@ function show_board() {
       }
       else if (map[x][y] !== 0) {
         if (map_sas[x][y] === 1) {
-          ctx.fillStyle = "#bbaaff";
+          ctx.fillStyle = "#ccccff";
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
-        if (map_sas[x][y] === 2) {
-          ctx.fillStyle = "#bbffaa";
+        else if (map_sas[x][y] === 2) {
+          ctx.fillStyle = "#aaffaa";
+          ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+        }
+        else if (map_sas[x][y] === 3) {
+          ctx.fillStyle = "#ffccff";
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
         if (x2 - x1 > 6) {
