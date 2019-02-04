@@ -13,11 +13,11 @@
 <script>
 let cols = 70;
 let rows = 40;
-let mines = Math.round(cols * rows / 5);
+let mines = Math.round(cols * rows / 4);
 generate(rows, cols, mines);
 
 <?php
-//$fname = "maps/map4.txt";
+//$fname = "maps/map6.txt";
 if ($fname != "") {
   $fa = file($fname);
   $cols = count($fa);
