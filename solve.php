@@ -11,9 +11,9 @@
 <script language='JavaScript' type='text/javascript' src='js/solve.js'></script>
 <script language='JavaScript' type='text/javascript' src='js/sas.js'></script>
 <script>
-let cols = 70;
-let rows = 40;
-let mines = Math.round(cols * rows / 4);
+let cols = 140;
+let rows = 80;
+let mines = Math.round(cols * rows / 5);
 generate(rows, cols, mines);
 
 <?php
